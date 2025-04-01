@@ -4,6 +4,8 @@ type Room struct {
 	ID string `json:"id"`
 	Name string `json:"name"`
 	Clients map[string]*Client `json:"clients"`
+	Admin int64 `json:"admin"`
+	Maxusers int64 `json:"maxusers"`
 }
 
 type Hub struct {

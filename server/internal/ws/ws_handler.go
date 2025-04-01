@@ -20,6 +20,8 @@ func Newhandler(h *Hub) *Handler {
 type CreateRoomReq struct {
 	ID string `json:"id"`
 	Name string `json:"name"`
+	Maxusers int64 `json:"maxusers"`
+	Admin int64 `json:"admin"`
 }
 
 func (h *Handler) CreateRoom(c *gin.Context) {
@@ -33,6 +35,8 @@ func (h *Handler) CreateRoom(c *gin.Context) {
 		ID:		req.ID,
 		Name:	req.Name,
 		Clients:make(map[string]*Client),
+		Maxusers: req.Maxusers,
+		Admin: req.Admin,
 	}
 
 	c.JSON(http.StatusOK,req)
@@ -47,14 +51,26 @@ var upgrader = websocket.Upgrader{
 }
 
 func (h *Handler) JoinRoom (c *gin.Context) {
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-	if err!=nil {
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
-	}
-
 	roomID := c.Param("roomId")
 	clientID := c.Query("userId")
 	username := c.Query("username")
+
+	room,exists := h.hub.Rooms[roomID]
+    if !exists {
+		c.JSON(http.StatusNotFound,gin.H{"error":"room not found"})
+		return
+	}
+
+	if len(room.Clients)==int(room.Maxusers) {
+		c.JSON(http.StatusBadRequest,gin.H{"error":"The room is Full"})
+		return
+	}
+
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err!=nil {
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
 
 	cl := &Client{
 		ID : clientID,
@@ -83,6 +99,8 @@ func (h *Handler) JoinRoom (c *gin.Context) {
 type RoomRes struct {
 	ID string `json:"id"`
 	Name string `json:"name"`
+	Maxusers int64 `json:"maxusers"`
+	Admin int64 `json:"admin"`
 }
 
 func (h *Handler) GetRooms (c* gin.Context) {
@@ -92,6 +110,8 @@ func (h *Handler) GetRooms (c* gin.Context) {
 		rooms = append(rooms, RoomRes{
 			ID:r.ID,
 			Name:r.Name,
+			Maxusers: r.Maxusers,
+			Admin: r.Admin,
 		})
 	}
 	c.JSON(http.StatusOK, rooms)

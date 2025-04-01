@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"server/util"
+	"github.com/Gurshan94/chatapp/util"
 	"strconv"
 	"time"
 

@@ -3,7 +3,7 @@ package user
 import "context"
 
 type User struct {
-	ID       int64 `json:"id" db:"id"`
+	ID       int64  `json:"id" db:"id"`
 	Username string `json:"username" db:"username"`
 	Email    string `json:"email" db:"email"`
 	Password string `json:"password" db:"password"`
@@ -28,8 +28,8 @@ type LoginUserReq struct {
 
 type LoginUserRes struct {
 	accessToken string
-	ID       string `json:"id" db:"id"`
-	Username string `json:"username" db:"username"`
+	ID          string `json:"id" db:"id"`
+	Username    string `json:"username" db:"username"`
 }
 
 type Repository interface {
