@@ -85,6 +85,7 @@ func (s *service) GetRooms(c context.Context, req *GetRoomsReq) ([]*GetRoomsRes,
 
 		res=append(res,&r) 
 	}
+	
 	return res, nil
 
 }

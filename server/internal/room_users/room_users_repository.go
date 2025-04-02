@@ -1,9 +1,8 @@
-package roomusers
+package room_users
 
 import (
 	"context"
 	"database/sql"
-	"github.com/Gurshan94/chatapp/internal/user"
 	"github.com/Gurshan94/chatapp/internal/room"
 )
 
@@ -22,19 +21,31 @@ func NewRepository(db DBTX) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) AddUserToRoom(ctx context.Context, roomID, userID int64) error {
+func (r *repository) AddUserToRoom(ctx context.Context,roomuser *RoomUser) (*RoomUser, error) {
+    var lastinsertid int
+	query:= `INSERT INTO room_users (room_id,user_id) VALUES ($1, $2) returning id`
+	err := r.db.QueryRowContext(ctx, query, roomuser.RoomID, roomuser.UserID).Scan(&lastinsertid)
+	if err!=nil {
+		return nil, err
+	}
+	roomuser.ID=int64(lastinsertid)
+
+	return roomuser, nil
+}
+
+func (r *repository) DeleteUserFromRoom(ctx context.Context, roomuser *RoomUser) error{
+	query:= `DELETE FROM room_users WHERE room_id=$1 AND user_id=$2`
+	_, err:= r.db.ExecContext(ctx, query, roomuser.RoomID, roomuser.UserID)
+	if err!=nil {
+		return err
+	}
+
 	return nil
 }
-func (r *repository) DeleteUserFromRoom(ctx context.Context, roomID, userID int64) error{
-	return nil
-}
-func (r *repository) GetUsersInRoom(ctx context.Context,roomID int64) ([]*user.User,error) {
-	var users []*user.User
-	return users,nil
-	
-}
-func (r *repository) GetRoomsJoinedByUser(ctx context.Context, userID int64) ([]*room.Room, error) {
+
+func (r *repository) GetRoomsJoinedByUser(ctx context.Context, userID int64) ([]*room.Room, []int, error) {
 	var rooms []*room.Room
+	var users []int
 
 	query:= `SELECT r.id, r.room_name, r.max_users, r.admin_id, COUNT(ru2.user_id) AS current_users
 		     FROM rooms r 
@@ -45,20 +56,23 @@ func (r *repository) GetRoomsJoinedByUser(ctx context.Context, userID int64) ([]
 
 	rows, err:= r.db.QueryContext(ctx, query, userID)
 	if err!=nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer rows.Close()
 
 
 	for rows.Next() {
 		room:= &room.Room{}
-		if err:= rows.Scan(&room.ID,&room.Roomname,&room.Maxusers,&room.AdminID); err!=nil{
-			return nil, err
+		var CurrentUser int
+
+		if err:= rows.Scan(&room.ID,&room.Roomname,&room.Maxusers,&room.AdminID,&CurrentUser); err!=nil{
+			return nil, nil, err
 		}
 
 		rooms= append(rooms, room)
+		users= append(users,CurrentUser)
 	}
 
-	return rooms, nil
+	return rooms, users, nil
 	
 }
