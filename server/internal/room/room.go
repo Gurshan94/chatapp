@@ -7,22 +7,22 @@ import (
 
 type Room struct {
 	ID       int64 `json:"id"`
-	Roomname string `json:"room_name"`
-	Maxusers int `json:"max_users"`
-	AdminID  int64 `json:"admin_id"`
+	Roomname string `json:"roomname"`
+	Maxusers int `json:"maxusers"`
+	AdminID  int64 `json:"adminid"`
 }
 
 type CreateRoomReq struct {
-	Roomname string `json:"room_name"`
-	Maxusers int `json:"max_users"`
-	AdminID  int64 `json:"admin_id"`
+	Roomname string `json:"roomname"`
+	Maxusers int `json:"maxusers"`
+	AdminID  int64 `json:"adminid"`
 }
 
 type CreateRoomRes struct {
 	ID       int64 `json:"id"`
-	Roomname string `json:"room_name"`
-	Maxusers int `json:"max_users"`
-	AdminID  int64 `json:"admin_id"`
+	Roomname string `json:"roomname"`
+	Maxusers int `json:"maxusers"`
+	AdminID  int64 `json:"adminid"`
 }
 
 type GetRoomsReq struct {
@@ -32,18 +32,18 @@ type GetRoomsReq struct {
 
 type GetRoomsRes struct {
 	ID           int64  `json:"id"`
-	Roomname     string `json:"room_name"`
-	Maxusers     int  `json:"max_users"`
-	AdminID      int64  `json:"admin_id"`
-	CurrentUsers int  `json:"current_users"`
+	Roomname     string `json:"roomname"`
+	Maxusers     int  `json:"maxusers"`
+	AdminID      int64  `json:"adminid"`
+	CurrentUsers int  `json:"currentusers"`
 }
 
 type GetRoomByIDRes struct {
 	ID           int64  `json:"id"`
-	Roomname     string `json:"room_name"`
-	Maxusers     int  `json:"max_users"`
-	AdminID      int64  `json:"admin_id"`
-	CurrentUsers int  `json:"current_users"`
+	Roomname     string `json:"roomname"`
+	Maxusers     int  `json:"maxusers"`
+	AdminID      int64  `json:"adminid"`
+	CurrentUsers int  `json:"currentusers"`
 	Users        []*user.User `json:"users"`
 }
 

@@ -7,6 +7,9 @@ import (
 	"github.com/Gurshan94/chatapp/internal/ws"
 	"github.com/Gurshan94/chatapp/internal/room"
 	"github.com/Gurshan94/chatapp/internal/room_users"
+	"github.com/Gurshan94/chatapp/internal/message"
+
+	
 	"github.com/Gurshan94/chatapp/router"
 )
 
@@ -28,10 +31,14 @@ func main() {
 	roomUserSvc := room_users.NewService(roomUserRep)
 	roomUserHandler :=room_users.NewHandler(roomUserSvc)
 
+	messageReq := message.NewRepository(dbConn.GetDB())
+	messageSvc := message.NewService(messageReq)
+	messageHandler := message.NewHandler(messageSvc)
+
     hub := ws.NewHub()
 	wsHandler := ws.Newhandler(hub)
 	go hub.Run()
 
-	router.InitRouter(userHandler, wsHandler, roomHandler, roomUserHandler)
+	router.InitRouter(userHandler, wsHandler, roomHandler, roomUserHandler, messageHandler)
 	router.Start("0.0.0.0:8080")
 }
