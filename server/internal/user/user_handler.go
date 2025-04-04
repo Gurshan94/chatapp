@@ -2,6 +2,8 @@ package user
 
 import (
 	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -57,4 +59,21 @@ func (h *Handler) Login(c *gin.Context) {
 func (h *Handler) Logout( c*gin.Context) {
 	c.SetCookie("jwt", "", -1, "", "", false, true)
 	c.JSON(http.StatusOK,gin.H{"message":"logout successfull"})
+}
+
+func(h *Handler) GetUserByID(c *gin.Context) {
+	userIDStr:=c.Param("userid")
+	userID, err:= strconv.ParseInt(userIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	user, err := h.Service.GetUserByID(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

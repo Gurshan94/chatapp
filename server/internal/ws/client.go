@@ -2,21 +2,26 @@ package ws
 
 import (
 	"log"
-
+	"encoding/json"
 	"github.com/gorilla/websocket"
 )
 
 type Client struct{
-	ID string `json:"id"`
-	RoomID string `json:"roomid"`
-	Username string `json:"username"`
+	ID int64 `json:"id"`
 	Conn *websocket.Conn
-	Message chan *Message
+	MessageChannel chan *IncomingMessage
 }
 
-type Message struct {
+type IncomingMessage struct {
 	Content string `json:"content"`
-	RoomID string `json:"roomid"`
+	RoomID int64 `json:"roomid"`
+	SenderID int64 `json:"senderid"`
+}
+
+type OutgoingMessage struct {
+	Content string `json:"content"`
+	RoomID int64 `json:"roomid"`
+	SenderID int64 `json:"senderid"`
 	Username string `json:"username"`
 }
 
@@ -26,7 +31,7 @@ func (c *Client) WriteMessage () {
 	}()
 
 	for {
-		message, ok := <- c.Message
+		message, ok := <- c.MessageChannel
 		if !ok {
 			return
 		}
@@ -36,7 +41,7 @@ func (c *Client) WriteMessage () {
 
 func (c *Client) ReadMessage (h *Hub) {
 	defer func() {
-		h.Unregister <- c
+		h.HandleUnregister(c)
         c.Conn.Close()
 	}()
 
@@ -49,12 +54,13 @@ func (c *Client) ReadMessage (h *Hub) {
 			break
 		}
 
-		msg := &Message{
-			Content: string(m),
-			RoomID: c.RoomID,
-			Username :c.Username,
+		var incomingMsg IncomingMessage
+		err = json.Unmarshal(m, &incomingMsg)
+		if err != nil {
+			log.Println("unmarshal error:", err)
+			return
 		}
 
-		h.Broadcast <- msg
+		h.Broadcast <- &incomingMsg
 	}
 }

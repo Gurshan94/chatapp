@@ -18,6 +18,7 @@ func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler, roomHandler *r
 	r.POST("/signup",userHandler.CreateUser)
 	r.POST("/login",userHandler.Login)
 	r.GET("/logout",userHandler.Logout)
+	r.GET("/getuserbyid/:userid",userHandler.GetUserByID)
 
 	r.POST("/createroom",roomHandler.CreateRoom)
 	r.GET("/getrooms",roomHandler.GetRooms)
@@ -32,10 +33,7 @@ func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler, roomHandler *r
 	r.POST("/deletemessage/:messageId",messageHandler.DeleteMessage)
 	r.GET("/fetchmessage",messageHandler.FetchMessage)
 
-	r.POST("/ws/createroom", wsHandler.CreateRoom)
-	r.GET("/ws/joinroom/:roomId",wsHandler.JoinRoom)
-	r.GET("/ws/getrooms",wsHandler.GetRooms)
-	r.GET("/ws/getclients/:roomId",wsHandler.GetClients)
+	r.GET("/ws/:userid", wsHandler.Servews)
 
 }
 

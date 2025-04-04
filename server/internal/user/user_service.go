@@ -93,3 +93,8 @@ func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, er
 		ID:          strconv.Itoa(int(u.ID)),
 	}, nil
 }
+
+func(s* service) GetUserByID(c context.Context, userID int64) (*User, error){
+	return s.Repository.GetUserByID(c, userID)
+}
+

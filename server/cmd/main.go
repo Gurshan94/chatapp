@@ -31,14 +31,14 @@ func main() {
 	roomUserSvc := room_users.NewService(roomUserRep)
 	roomUserHandler :=room_users.NewHandler(roomUserSvc)
 
-	messageReq := message.NewRepository(dbConn.GetDB())
-	messageSvc := message.NewService(messageReq)
+	messageRep := message.NewRepository(dbConn.GetDB())
+	messageSvc := message.NewService(messageRep)
 	messageHandler := message.NewHandler(messageSvc)
 
-    hub := ws.NewHub()
+    hub := ws.NewHub(userRep, messageRep, roomUserRep)
 	wsHandler := ws.Newhandler(hub)
 	go hub.Run()
 
-	router.InitRouter(userHandler, wsHandler, roomHandler, roomUserHandler, messageHandler)
+	router.InitRouter(userHandler, wsHandler, roomHandler, roomUserHandler, messageHandler, )
 	router.Start("0.0.0.0:8080")
 }
