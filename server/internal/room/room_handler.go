@@ -33,10 +33,22 @@ func (h *Handler) CreateRoom(c *gin.Context) {
 }
 
 func (h *Handler) GetRooms(c *gin.Context) {
-	var req GetRoomsReq
-	if err:=c.ShouldBindJSON(&req); err!=nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
-		return
+	limitStr:=c.Query("limit")
+	offsetStr:=c.Query("offset")
+	limit, err := strconv.Atoi(limitStr)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
+        return
+    }
+
+    offset, err := strconv.Atoi(offsetStr)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid offset"})
+        return
+    }
+	req:=GetRoomsReq{
+		Limit: limit,
+		Offset: offset,
 	}
 
 	res, err:=h.Service.GetRooms(c.Request.Context(),&req)

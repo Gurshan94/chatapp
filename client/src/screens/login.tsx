@@ -4,41 +4,30 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store"; // adjust this if needed
-import { login } from "../state/user/userSlice"; // your user slice action
+import { useLoginMutation} from "../state/user/userApiSlice"; // your user slice action
+import { setCredentials } from "../state/user/authSlice";
 
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [login] = useLoginMutation();
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [Error, setError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
 
     try {
-      const res = await fetch("http://localhost:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // use this if backend sets cookie
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Login failed");
-      }
-
-      const data = await res.json();
-      dispatch(login(data));
-      navigate("/chat"); // or wherever your chat screen is
+      const data = await login({ email, password }).unwrap();
+      dispatch(setCredentials(data)); 
+      navigate('/chat');
     } catch (err: any) {
-      setError(err.message);
+      setError(err.data?.message || 'Login failed');
     }
   };
 
@@ -52,8 +41,8 @@ const Login = () => {
       >
         <h2 className="text-3xl font-bold text-center mb-6">Login to ChatZone</h2>
 
-        {error && (
-          <p className="text-red-400 text-sm text-center mb-4">{error}</p>
+        {Error && (
+          <p className="text-red-400 text-sm text-center mb-4">{Error}</p>
         )}
 
         <form className="space-y-4" onSubmit={handleLogin}>

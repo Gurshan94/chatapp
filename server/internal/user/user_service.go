@@ -9,19 +9,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-const (
-	secretKey = "secret"
-)
 
 type service struct {
 	Repository
 	timeout time.Duration
-}
-
-type MyJWTClaims struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	jwt.RegisteredClaims
 }
 
 func NewService(repository Repository) Service {
@@ -65,26 +56,27 @@ func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, er
 
 	u, err := s.Repository.GetUserByEmail(ctx, req.Email)
 	if err != nil {
-		return &LoginUserRes{}, nil
+		return nil, err
 	}
 
 	err = util.CheckPassword(req.Password, u.Password)
 	if err != nil {
-		return &LoginUserRes{}, nil
+		return nil, err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MyJWTClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, util.MyJWTClaims{
 		ID:       strconv.Itoa(int(u.ID)),
 		Username: u.Username,
+		Email: u.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    strconv.Itoa(int(u.ID)),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	})
 
-	ss, err := token.SignedString([]byte(secretKey))
+	ss, err := token.SignedString([]byte("secret"))
 	if err != nil {
-		return &LoginUserRes{}, err
+		return nil, err
 	}
 
 	return &LoginUserRes{

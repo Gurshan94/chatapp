@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/Gurshan94/chatapp/util"
 )
 
 type Handler struct {
@@ -39,7 +40,7 @@ func (h *Handler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+    
 	u, err := h.Service.Login(c.Request.Context(), &user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -76,4 +77,24 @@ func(h *Handler) GetUserByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) Me(c *gin.Context) {
+    user, exists := c.Get("user")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+        return
+    }
+
+    claims, ok := user.(*util.MyJWTClaims)
+    if !ok {
+        c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "id":       claims.ID,
+        "username": claims.Username,
+        "email":    claims.Email,
+    })
 }

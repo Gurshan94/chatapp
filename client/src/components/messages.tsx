@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
-import { fetchItems } from "./ietms";
+import { fetchItems } from "./items";
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
@@ -39,7 +39,7 @@ const Message = () => {
           </div>
         ))}
   
-        <div ref={ref}>{isFetchingNextPage && 'Loading more...'}</div>
+        <div ref={ref}>{isFetchingNextPage}</div>
       </div>
     );
   };

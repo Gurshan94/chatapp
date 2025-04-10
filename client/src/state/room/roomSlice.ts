@@ -7,27 +7,28 @@ export interface Message{
     username: string
 }
 
-interface Room {
-    id: number,
-    roomname: string,
-    maxusers: number,
-    adminid: number,
-    currentUsers: number,
-    unreadCount: number,
-    messages: Message[]
-    isopen: boolean
-}
+export interface BackendRoom {
+    id: number;
+    roomname: string;
+    maxusers: number;
+    adminid: number;
+    currentusers: number;
+  }
+
+export interface Room extends BackendRoom {
+    unreadCount: number;
+    isopen: boolean;
+    messages: Message[];
+  }
 
 interface roomState {
     joinedRooms: Room[],
-    discoverableRooms: Room[],
     selectedRoomId: number | null,
     activeTab: "joined" | "discover";
 }
 
 const initialState: roomState = {
     joinedRooms: [],
-    discoverableRooms: [],
     selectedRoomId: null,
     activeTab: "joined",
 }
@@ -36,16 +37,8 @@ const roomSlice = createSlice({
     name:'room',
     initialState,
     reducers:{
-        setJoinedRooms:(state, action:PayloadAction<Room[]>) => {
+        setJoinedRooms:(state, action:PayloadAction<BackendRoom[]>) => {
             state.joinedRooms=action.payload.map(room=>({
-                ...room,
-                unreadCount: 0,
-                isopen: false,
-                messages:[],
-            }));
-        },
-        setDiscoverableRooms:(state, action:PayloadAction<Room[]>) => {
-            state.discoverableRooms=action.payload.map(room=>({
                 ...room,
                 unreadCount: 0,
                 isopen: false,
@@ -54,6 +47,7 @@ const roomSlice = createSlice({
         },
         openRoom:(state, action:PayloadAction<{roomId:number,messages:Message[]}>) => {
             const room=state.joinedRooms.find(r => r.id == action.payload.roomId)
+
             if (room) {
                 room.isopen=true;
                 room.messages=action.payload.messages;
@@ -84,10 +78,7 @@ const roomSlice = createSlice({
         setActiveTab: (state, action: PayloadAction<"joined" | "discover">) => {
             state.activeTab = action.payload;
         },
-        joinRoom: (state, action: PayloadAction<Room>) => {
-            state.discoverableRooms = state.discoverableRooms.filter(
-              r => r.id !== action.payload.id
-            );
+        joinRoom: (state, action: PayloadAction<BackendRoom>) => {
           
             state.joinedRooms.push({
               ...action.payload,
@@ -99,22 +90,10 @@ const roomSlice = createSlice({
         leaveRoom: (state, action: PayloadAction<number>) => {
             const roomId = action.payload;
           
-            const index = state.joinedRooms.findIndex(room => room.id === roomId);
-            if (index !== -1) {
-              const [leftRoom] = state.joinedRooms.splice(index, 1);
-          
-              state.discoverableRooms.push({
-                id: leftRoom.id,
-                roomname: leftRoom.roomname,
-                maxusers: leftRoom.maxusers,
-                adminid: leftRoom.adminid,
-                currentUsers: leftRoom.currentUsers,
-                unreadCount: 0,
-                isopen: false,
-                messages: [],
-              });
-            }
-          
+            state.joinedRooms = state.joinedRooms.filter(
+              r => r.id !== roomId
+            );
+            
             if (state.selectedRoomId === roomId) {
               state.selectedRoomId = null;
             }
@@ -122,5 +101,5 @@ const roomSlice = createSlice({
     }
 })
 
-export const {setJoinedRooms,setDiscoverableRooms,openRoom,closeRoom,addMessage,setActiveTab,joinRoom,leaveRoom} = roomSlice.actions;
+export const {setJoinedRooms,openRoom,closeRoom,addMessage,setActiveTab,joinRoom,leaveRoom} = roomSlice.actions;
 export default roomSlice.reducer;
