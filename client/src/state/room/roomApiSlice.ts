@@ -25,7 +25,16 @@ export const roomApi = createApi({
                 },
             }),
         }),
+        fetchmessages: builder.mutation<any, {roomid:number| null, limit:number, offset:number}>({
+            query:(credentials) =>({
+                url: `/fetchmessage/${credentials.roomid}?limit=${credentials.limit}&offset=${credentials.offset}`,
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }),
+        }),
     })
 })
 
-export const {useGetroomsjoinedbyuserMutation, useGetroomsMutation}=roomApi
+export const {useGetroomsjoinedbyuserMutation, useGetroomsMutation,useFetchmessagesMutation}=roomApi

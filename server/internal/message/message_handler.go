@@ -2,8 +2,9 @@ package message
 
 import (
 	"net/http"
-	"github.com/gin-gonic/gin"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -33,10 +34,31 @@ func (h *Handler) AddMessage(c *gin.Context) {
 }
 
 func (h *Handler) FetchMessage(c *gin.Context) {
-	var req FetchMessageReq
-	if err:=c.ShouldBindJSON(&req); err!=nil {
+	roomIDStr := c.Param("roomId")
+    roomID, err := strconv.ParseInt(roomIDStr, 10, 64)
+	if err!=nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
 		return
+	}	
+	limitStr:=c.Query("limit")
+	offsetStr:=c.Query("offset")
+
+	limit, err := strconv.ParseInt(limitStr, 10, 64)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
+        return
+    }
+
+	offset, err := strconv.ParseInt(offsetStr, 10, 64)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
+        return
+    }
+    
+	req:=FetchMessageReq{
+		RoomID: roomID,
+		Limit: limit,
+		Offset: offset,
 	}
 
 	res, err:=h.Service.FetchMessage(c.Request.Context(),&req)

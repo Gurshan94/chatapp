@@ -2,9 +2,10 @@ import { useDispatch,useSelector } from "react-redux";
 import { useGetroomsjoinedbyuserMutation } from "../state/room/roomApiSlice";
 import { AppDispatch, RootState } from "../state/store";
 import { openRoom, setJoinedRooms } from "../state/room/roomSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import RoomCard from "./roomcard";
 import { Room } from "../state/room/roomSlice";
+import { BackendRoom } from "../state/room/roomSlice";
 
   const RoomList = () => {
     
@@ -16,10 +17,9 @@ import { Room } from "../state/room/roomSlice";
     const [Error, setError] = useState("");
 
     useEffect(()=>{
-
           const fetchRooms = async () => {
             try {
-              const data = await fetchjoinedrooms({ userid }).unwrap();
+              const data:BackendRoom[] = await fetchjoinedrooms({ userid }).unwrap();
               dispatch(setJoinedRooms(data));
             } catch (err: any) {
               setError(err.data?.message || 'couldn’t fetch rooms');
@@ -29,13 +29,8 @@ import { Room } from "../state/room/roomSlice";
       
     },[userid, activeTab])
 
-    const handleOpenroom=(roomid:number)=>{
-      
-
-    }
-  
-
     const allRooms=useSelector((state:RootState)=>state.room.joinedRooms)
+
 
     return (
       <div className="flex flex-col h-full w-72 bg-gray-850 border-r border-gray-700">
@@ -45,7 +40,7 @@ import { Room } from "../state/room/roomSlice";
             {allRooms.map((room: Room) => (
               <div
                 key={room.id}
-                onClick={() => handleOpenroom(room.id)}
+                onClick={() => dispatch(openRoom({roomId:room.id}))}
                 className="cursor-pointer"
               >
                 <RoomCard room={room} />

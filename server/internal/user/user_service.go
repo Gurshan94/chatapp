@@ -43,7 +43,7 @@ func (s *service) CreateUser(c context.Context, req *CreateUserReq) (*CreateUser
 	}
 
 	res := &CreateUserRes{
-		ID:       strconv.Itoa(int(r.ID)),
+		ID:       r.ID,
 		Username: r.Username,
 		Email:    r.Email,
 	}
@@ -80,9 +80,10 @@ func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, er
 	}
 
 	return &LoginUserRes{
-		accessToken: ss,
+		AccessToken: ss,
 		Username:    u.Username,
-		ID:          strconv.Itoa(int(u.ID)),
+		ID:          u.ID,
+		Email: u.Email,
 	}, nil
 }
 

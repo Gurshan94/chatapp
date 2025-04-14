@@ -37,35 +37,32 @@ func (r *repository) AddMessage(ctx context.Context, message *Message) (*Message
 	return message, nil
 }
 
-func (r *repository) FetchMessage(ctx context.Context, roomID, limit int64, cursor *time.Time) ([]*FetchMessage, *time.Time, error) {
+func (r *repository) FetchMessage(ctx context.Context, roomID, limit, offset int64 ) ([]*FetchMessage, error) {
 	query := `
-		SELECT m.id, m.room_id, m.sender_id, u.username,  m.content, m.deleted, m.created_at 
+		SELECT m.id, m.room_id, m.sender_id, u.username, m.content, m.deleted, m.created_at 
 		FROM messages m 
 		JOIN users u ON m.sender_id = u.id  
 		WHERE m.room_id = $1 
-		AND ($2::TIMESTAMP IS NULL OR m.created_at < $2) 
 		AND m.deleted = FALSE
 		ORDER BY m.created_at DESC 
-		LIMIT $3;`
-	rows, err := r.db.QueryContext(ctx, query, roomID, cursor, limit)
+		LIMIT $2 OFFSET $3;`
+	rows, err := r.db.QueryContext(ctx, query, roomID, limit, offset)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer rows.Close()
 
 	var messages []*FetchMessage
-	var lastCreatedAt *time.Time
 
 	for rows.Next() {
 		var msg FetchMessage
 		err := rows.Scan(&msg.ID, &msg.RoomID, &msg.SenderID, &msg.Username,&msg.Content, &msg.Deleted, &msg.CreatedAt)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		messages = append(messages, &msg)
-		lastCreatedAt = &msg.CreatedAt
 	}
-	return messages, lastCreatedAt, nil
+	return messages, nil
 }
 
 func (r *repository) DeleteMessage(ctx context.Context, messageID int64) error {

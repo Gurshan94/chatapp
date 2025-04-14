@@ -47,11 +47,13 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("jwt", u.accessToken, 3600, "/", "localhost", false, true)
+	c.SetCookie("jwt", u.AccessToken, 3600, "/", "localhost", false, false)
 
 	res := &LoginUserRes{
+		AccessToken: u.AccessToken,
 		Username: u.Username,
 		ID:       u.ID,
+		Email: u.Email,
 	}
 
 	c.JSON(http.StatusOK, res)

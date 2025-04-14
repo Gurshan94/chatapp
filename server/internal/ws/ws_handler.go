@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"strconv"
 	"log"
+	"github.com/Gurshan94/chatapp/util"
 )
 
 type Handler struct {
@@ -28,6 +29,14 @@ var upgrader = websocket.Upgrader{
 
 
 func(h *Handler) Servews(c *gin.Context) {
+    token := c.Query("token")
+    _, Err:=util.ValidateJWT(token)
+	
+	if Err!=nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":Err.Error()})
+		c.Abort()
+		return
+	}
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err!=nil {
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})

@@ -96,7 +96,7 @@ func(h *Hub) HandleBroadcast(m *IncomingMessage) {
 		Content: m.Content,
 	}
 
-	_, err:=h.MessageRepo.AddMessage(context.Background(),msg)
+	message, err:=h.MessageRepo.AddMessage(context.Background(),msg)
 	if err!=nil {
 		log.Printf("Error saving message to db %v", err)
         return
@@ -109,9 +109,10 @@ func(h *Hub) HandleBroadcast(m *IncomingMessage) {
 	}
 
 	outgoingmessage:=&OutgoingMessage{
-		RoomID: m.RoomID,
-		SenderID: m.SenderID,
-		Content: m.Content,
+		ID:message.ID,
+		RoomID: message.RoomID,
+		SenderID: message.SenderID,
+		Content: message.Content,
 		Username: user.Username,
 	}
 

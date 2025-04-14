@@ -9,6 +9,13 @@ interface AuthState {
     } | null;
 }
 
+export interface User {
+    id:number,
+    username:string,
+    email:string,
+    token:string
+}
+
 const initialState: AuthState = {
     isLoggedin: false,
     user: null,
@@ -18,7 +25,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setCredentials:(state,action:PayloadAction<{id:number; username:string; email:string; password:string}>) => {
+        setCredentials:(state,action:PayloadAction<{id:number; username:string; email:string}>) => {
             state.isLoggedin=true;
             state.user={
                 id:action.payload.id,

@@ -42,19 +42,31 @@ func (s *service) AddMessage(c context.Context, req *AddMessagereq) (*AddMessage
 	return res, nil
 
 }
-func (s *service) FetchMessage(c context.Context, req *FetchMessageReq) (*FetchMessageRes, error) {
+func (s *service) FetchMessage(c context.Context, req *FetchMessageReq) ([]*FetchMessageRes, error) {
 	ctx, cancel:= context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	messages, lastcreateat, err:= s.Repository.FetchMessage(ctx, req.RoomID, req.Limit, req.Cursor)
+	messages, err:= s.Repository.FetchMessage(ctx, req.RoomID, req.Limit, req.Offset)
 	if err!=nil {
 		return nil, err
 	}
+	
+	res:=make([]*FetchMessageRes,0,len(messages))
 
-    res:=&FetchMessageRes{
-		Messages: messages,
-		Cursor: lastcreateat,
+	for _, value := range messages {
+		r:=FetchMessageRes{
+			ID:           value.ID,
+			RoomID:     value.RoomID,
+			SenderID:     value.SenderID,
+			Username:      value.Username,
+			Content: value.Content,
+			Deleted: value.Deleted,
+			CreatedAt: value.CreatedAt,
+		}
+
+		res=append(res,&r) 
 	}
+	
 	return res, nil
 }
 func (s *service) DeleteMessage(c context.Context, messageID int64) error {

@@ -49,8 +49,8 @@ func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler, roomHandler *r
 
 	auth.POST("/addmessage",messageHandler.AddMessage)
 	auth.POST("/deletemessage/:messageId",messageHandler.DeleteMessage)
-	auth.GET("/fetchmessage",messageHandler.FetchMessage)
-	auth.GET("/ws/:userid", wsHandler.Servews)
+	auth.GET("/fetchmessage/:roomId",messageHandler.FetchMessage)
+	r.GET("/ws/:userid", wsHandler.Servews)
 
 }
 

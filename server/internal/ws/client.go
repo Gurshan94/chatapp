@@ -19,6 +19,7 @@ type IncomingMessage struct {
 }
 
 type OutgoingMessage struct {
+	ID int64 `json:"id"`
 	Content string `json:"content"`
 	RoomID int64 `json:"roomid"`
 	SenderID int64 `json:"senderid"`

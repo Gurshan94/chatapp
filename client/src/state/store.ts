@@ -12,8 +12,14 @@ export const store = configureStore({
         room: roomReducer
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(userApi.middleware),
-});
+        getDefaultMiddleware({
+            serializableCheck: {
+              // ignore the socket path and the action that includes it
+              ignoredActions: ['user/setCredentials'],
+              ignoredPaths: ['user.socket'],
+            },
+          }).concat(userApi.middleware, roomApi.middleware),
+    });
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch

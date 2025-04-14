@@ -14,6 +14,7 @@ import {
 import Login from './screens/login.tsx';
 import Signup from './screens/signup.tsx';
 import Chat from './screens/chat.tsx';
+import { SocketProvider } from './utils/socketProvider.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,10 +32,12 @@ const queryClient=new QueryClient();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <SocketProvider>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       </QueryClientProvider>
     </Provider>
+    </SocketProvider>
   </StrictMode>
 );

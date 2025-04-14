@@ -1,10 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Message{
+    id:number
     roomid: number,
     senderid: number,
     content: string,
     username: string
+}
+
+export interface outMessage{
+    roomid: number | null,
+    senderid: number | undefined,
+    content: string,
 }
 
 export interface BackendRoom {
@@ -17,20 +24,20 @@ export interface BackendRoom {
 
 export interface Room extends BackendRoom {
     unreadCount: number;
-    isopen: boolean;
-    messages: Message[];
-  }
+}
 
 interface roomState {
     joinedRooms: Room[],
     selectedRoomId: number | null,
-    activeTab: "joined" | "discover";
+    activeTab: "joined" | "discover",
+    messages: Message[]
 }
 
 const initialState: roomState = {
     joinedRooms: [],
     selectedRoomId: null,
     activeTab: "joined",
+    messages: []
 }
 
 const roomSlice = createSlice({
@@ -41,52 +48,53 @@ const roomSlice = createSlice({
             state.joinedRooms=action.payload.map(room=>({
                 ...room,
                 unreadCount: 0,
-                isopen: false,
                 messages:[],
             }));
         },
-        openRoom:(state, action:PayloadAction<{roomId:number,messages:Message[]}>) => {
+        openRoom:(state, action:PayloadAction<{roomId:number}>) => {
             const room=state.joinedRooms.find(r => r.id == action.payload.roomId)
 
             if (room) {
-                room.isopen=true;
-                room.messages=action.payload.messages;
                 room.unreadCount=0;
                 state.selectedRoomId=room.id;
+                state.messages=[]
             }
         },
-        closeRoom:(state,action:PayloadAction<{roomId:number}>)=>{
-            const room=state.joinedRooms.find(r => r.id == action.payload.roomId)
+        appendMessages: (state, action: PayloadAction<{ roomId: number| null, messages: Message[] }>) => {
+            const room = state.joinedRooms.find(r => r.id === action.payload.roomId);
             if (room) {
-                room.isopen=false;
-                room.messages=[];
-                if (state.selectedRoomId==room.id){
-                    state.selectedRoomId=null;
+
+              const existingIds = new Set(state.messages.map(m => m.id));
+              const newMessages = action.payload.messages.filter(m => !existingIds.has(m.id));
+              state.messages.push(...newMessages);
+            }
+        },
+
+        addMessage: (state, action: PayloadAction<Message>) => {
+            const  message  = action.payload;
+            const openedRoomId = state.selectedRoomId;
+          
+            if (message.roomid==openedRoomId) {
+                state.messages = [message,...state.messages];
+            } else {
+                const room=state.joinedRooms.find(r => r.id == message.roomid)
+                if (room){
+                    room.unreadCount+=1
                 }
             }
         },
-        addMessage: (state, action: PayloadAction<{ roomId: number; message: Message }>) => {
-            const room = state.joinedRooms.find(r => r.id === action.payload.roomId);
-            if (room) {
-              if (room.isopen) {
-                room.messages.push(action.payload.message);
-              } else {
-                room.unreadCount += 1;
-              }
-            }
-        },
+
         setActiveTab: (state, action: PayloadAction<"joined" | "discover">) => {
             state.activeTab = action.payload;
         },
+
         joinRoom: (state, action: PayloadAction<BackendRoom>) => {
-          
             state.joinedRooms.push({
               ...action.payload,
               unreadCount: 0,
-              isopen: false,
-              messages: [],
             });
         },
+
         leaveRoom: (state, action: PayloadAction<number>) => {
             const roomId = action.payload;
           
@@ -101,5 +109,13 @@ const roomSlice = createSlice({
     }
 })
 
-export const {setJoinedRooms,openRoom,closeRoom,addMessage,setActiveTab,joinRoom,leaveRoom} = roomSlice.actions;
+export const {
+    setJoinedRooms,
+    openRoom,
+    addMessage,
+    setActiveTab,
+    joinRoom,
+    leaveRoom,
+    appendMessages
+} = roomSlice.actions;
 export default roomSlice.reducer;

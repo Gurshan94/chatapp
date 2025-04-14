@@ -39,24 +39,29 @@ type FetchMessage struct {
 }
 
 type FetchMessageRes struct {
-	Messages []*FetchMessage `json:"messages"`
-	Cursor *time.Time `json:"cursor"`
+	ID        int64 `json:"id"`
+	RoomID    int64 `json:"roomid"`
+	SenderID  int64 `json:"senderid"`
+	Username  string `json:"username"`
+	Content   string `json:"content"`
+	Deleted   bool `json:"deleted"`
+	CreatedAt time.Time
 }
 
 type FetchMessageReq struct {
 	RoomID int64 `json:"roomid"`
 	Limit int64 `json:"limit"`
-	Cursor *time.Time `json:"cursor"`
+	Offset int64 `json:"offset"`
 }
 
 type Repository interface {
 	AddMessage (ctx context.Context, message *Message) (*Message, error) 
-	FetchMessage (ctx context.Context, roomID, limit int64, cursor *time.Time) ([]*FetchMessage, *time.Time, error)
+	FetchMessage (ctx context.Context, roomID, limit, offset int64  ) ([]*FetchMessage, error)
 	DeleteMessage (ctx context.Context, messageID int64) error 
 }
 
 type Service interface {
 	AddMessage (c context.Context, req *AddMessagereq) (*AddMessageRes, error) 
-	FetchMessage (c context.Context, req *FetchMessageReq) (*FetchMessageRes, error)
+	FetchMessage (c context.Context, req *FetchMessageReq) ([]*FetchMessageRes, error)
 	DeleteMessage (c context.Context, messageID int64) error 
 }

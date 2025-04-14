@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState,useContext } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store"; // adjust this if needed
 import { useLoginMutation} from "../state/user/userApiSlice"; // your user slice action
-import { setCredentials } from "../state/user/authSlice";
+import { setCredentials, User } from "../state/user/authSlice";
+import SocketContext, { useSocket } from "../utils/socketProvider";
 
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -17,14 +18,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [Error, setError] = useState("");
+  const {connectSocket}=useSocket()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      const data = await login({ email, password }).unwrap();
-      dispatch(setCredentials(data)); 
+      const data:User = await login({ email, password }).unwrap();
+      console.log(typeof data.id)
+      connectSocket(data.id,data.token)
+      dispatch(setCredentials({...data}));
       navigate('/chat');
     } catch (err: any) {
       setError(err.data?.message || 'Login failed');
