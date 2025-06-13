@@ -9,7 +9,6 @@ const Messagearea=()=>{
 
     const roomid=useSelector((state:RootState)=>state.room.selectedRoomId)
     const userId=useSelector((state:RootState)=>state.user.user?.id)
-    console.log(typeof userId)
     const {socket}=useSocket();
     const dispatch = useDispatch();
     const [message, setMessage] = useState(''); // State for message input
@@ -47,7 +46,6 @@ const Messagearea=()=>{
           };
     
           // Send the message through WebSocket
-          console.log(newMessage)
           socket.send(JSON.stringify(newMessage));     
           // Clear the input after sending the message
           setMessage('');

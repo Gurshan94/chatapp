@@ -9,6 +9,7 @@ import { useGetMeQuery } from '../state/user/userApiSlice.ts';
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store"; // adjust this if needed
 import { setCredentials } from "../state/user/authSlice";
+import CreateRoomDialog from '../components/createroom.tsx';
 
 const Chat = () => {
 
@@ -28,7 +29,7 @@ const Chat = () => {
   return (
     <div className="flex h-screen bg-gray-900">
         <Sidebar />
-        {activeTab=='joined'?<RoomList />:<DiscoverRoomList/>}
+        {activeTab=='joined'?<RoomList />:activeTab=="discover"?<DiscoverRoomList/>:<CreateRoomDialog/>}
         {openedroomid ? 
         <Messagearea/>:
         <div className="flex flex-1 flex-col items-center justify-center text-center text-gray-400 px-4">

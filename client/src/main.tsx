@@ -26,9 +26,7 @@ const router = createBrowserRouter(
   )
 );
 
-
 const queryClient=new QueryClient();
-
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

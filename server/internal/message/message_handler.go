@@ -85,5 +85,5 @@ func (h *Handler) DeleteMessage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK,gin.H{"messsage":"Message Deleted sucessfully"})
+	c.JSON(http.StatusOK,gin.H{"message":"Message Deleted sucessfully"})
 }

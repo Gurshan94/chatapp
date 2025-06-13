@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { useState,useContext } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../state/store"; // adjust this if needed
 import { useLoginMutation} from "../state/user/userApiSlice"; // your user slice action
 import { setCredentials, User } from "../state/user/authSlice";
-import SocketContext, { useSocket } from "../utils/socketProvider";
+import { useSocket } from "../utils/socketProvider";
 
 const Login = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,7 +26,6 @@ const Login = () => {
 
     try {
       const data:User = await login({ email, password }).unwrap();
-      console.log(typeof data.id)
       connectSocket(data.id,data.token)
       dispatch(setCredentials({...data}));
       navigate('/chat');

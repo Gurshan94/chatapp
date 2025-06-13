@@ -34,7 +34,43 @@ export const roomApi = createApi({
                 },
             }),
         }),
+        deletemessage: builder.mutation<any, {messageId:number}>({
+            query:(credentials) =>({
+                url: `/deletemessage/${credentials.messageId}`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }),
+        }),
+        createroom: builder.mutation<any, {roomname:string, maxusers:number, adminid:number}>({
+            query:(credentials)=>({
+                url:'/createroom',
+                method:'POST',
+                body:credentials,
+                headers:{
+                    'Content-Type':'application/json',
+                },
+            })
+        }),
+        joinroom: builder.mutation<any, {roomid:number, userid:number}>({
+            query:(credentials)=>({
+                url:'/addusertoroom',
+                method:'POST',
+                body:credentials,
+                headers:{
+                    'Content-Type':'application/json',
+                },
+            })
+        })
     })
 })
 
-export const {useGetroomsjoinedbyuserMutation, useGetroomsMutation,useFetchmessagesMutation}=roomApi
+export const {
+    useGetroomsjoinedbyuserMutation,
+    useGetroomsMutation,
+    useFetchmessagesMutation,
+    useDeletemessageMutation,
+    useCreateroomMutation,
+    useJoinroomMutation
+}=roomApi

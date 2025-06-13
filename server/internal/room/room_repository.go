@@ -84,7 +84,7 @@ func (r *repository) DeleteRoom(ctx context.Context, roomID int64) error {
 	return nil
 }
 
-func (r *repository) GetRooms(ctx context.Context,Limit, Offset int) ([]*Room, []int, error) {
+func (r *repository) GetRooms(ctx context.Context,Limit, Offset int, UserId int64) ([]*Room, []int, error) {
     
     var rooms []*Room
 	var currentusers []int
@@ -92,11 +92,14 @@ func (r *repository) GetRooms(ctx context.Context,Limit, Offset int) ([]*Room, [
 	query := `SELECT r.id, r.room_name, r.max_users, r.admin_id, COUNT(ru.user_id) AS current_users 
 	          FROM rooms r
 			  LEFT JOIN room_users ru ON r.id=ru.room_id
+			  WHERE r.id NOT IN (
+              SELECT room_id FROM room_users WHERE user_id = $3
+              )
 			  GROUP BY r.id, r.room_name, r.max_users, r.admin_id
 			  ORDER BY r.id
 			  LIMIT $1 OFFSET $2`
 			  
-	rows, err := r.db.QueryContext(ctx, query, Limit, Offset)
+	rows, err := r.db.QueryContext(ctx, query, Limit, Offset, UserId)
 	if err!=nil {
 		return nil, nil, err
 	}

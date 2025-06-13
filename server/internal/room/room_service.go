@@ -37,6 +37,7 @@ func (s *service) CreateRoom(c context.Context, req *CreateRoomReq) (*CreateRoom
 		Roomname:  room.Roomname,
 		Maxusers: room.Maxusers,
 		AdminID: room.AdminID,
+		CurrentUsers: 1,
 	}
 
 	return res, nil
@@ -67,7 +68,7 @@ func (s *service) GetRooms(c context.Context, req *GetRoomsReq) ([]*GetRoomsRes,
 	ctx, cancel:= context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	rooms, currentusers, err:= s.Repository.GetRooms(ctx,req.Limit, req.Offset)
+	rooms, currentusers, err:= s.Repository.GetRooms(ctx,req.Limit, req.Offset,req.UserId)
 	if err!=nil {
 		return nil, err
 	}

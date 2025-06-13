@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"github.com/Gurshan94/chatapp/util"
 )
 
 type Handler struct {
@@ -46,7 +47,21 @@ func (h *Handler) GetRooms(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": "invalid offset"})
         return
     }
+
+	user, exists := c.Get("user")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+        return
+    }
+
+    claims, ok := user.(*util.MyJWTClaims)
+    if !ok {
+        c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token"})
+        return
+    }
+
 	req:=GetRoomsReq{
+		UserId:claims.ID,
 		Limit: limit,
 		Offset: offset,
 	}

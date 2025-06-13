@@ -20,7 +20,7 @@ export interface BackendRoom {
     maxusers: number;
     adminid: number;
     currentusers: number;
-  }
+}
 
 export interface Room extends BackendRoom {
     unreadCount: number;
@@ -29,7 +29,7 @@ export interface Room extends BackendRoom {
 interface roomState {
     joinedRooms: Room[],
     selectedRoomId: number | null,
-    activeTab: "joined" | "discover",
+    activeTab: "joined" | "discover" | "create",
     messages: Message[]
 }
 
@@ -51,6 +51,9 @@ const roomSlice = createSlice({
                 messages:[],
             }));
         },
+        closeroom:(state)=>{
+            state.selectedRoomId=null
+        },
         openRoom:(state, action:PayloadAction<{roomId:number}>) => {
             const room=state.joinedRooms.find(r => r.id == action.payload.roomId)
 
@@ -70,6 +73,10 @@ const roomSlice = createSlice({
             }
         },
 
+        deleteMessageWithID:(state,action:PayloadAction<{messageId:number}>)=>{
+            state.messages=state.messages.filter(m=>m.id!=action.payload.messageId)
+        },
+
         addMessage: (state, action: PayloadAction<Message>) => {
             const  message  = action.payload;
             const openedRoomId = state.selectedRoomId;
@@ -84,7 +91,7 @@ const roomSlice = createSlice({
             }
         },
 
-        setActiveTab: (state, action: PayloadAction<"joined" | "discover">) => {
+        setActiveTab: (state, action: PayloadAction<"joined" | "discover" | "create">) => {
             state.activeTab = action.payload;
         },
 
@@ -116,6 +123,8 @@ export const {
     setActiveTab,
     joinRoom,
     leaveRoom,
-    appendMessages
+    appendMessages,
+    deleteMessageWithID,
+    closeroom
 } = roomSlice.actions;
 export default roomSlice.reducer;

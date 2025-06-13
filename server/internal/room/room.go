@@ -23,9 +23,11 @@ type CreateRoomRes struct {
 	Roomname string `json:"roomname"`
 	Maxusers int `json:"maxusers"`
 	AdminID  int64 `json:"adminid"`
+	CurrentUsers int `json:"currentusers"`
 }
 
 type GetRoomsReq struct {
+	UserId int64 `json:"userid"`
 	Limit  int `json:"limit"`
 	Offset int `json:"offset"`
 }
@@ -50,7 +52,7 @@ type GetRoomByIDRes struct {
 type Repository interface {
 	CreateRoom(ctx context.Context, room *Room) (*Room, error)
 	GetRoomByID(ctx context.Context, roomID int64) (*Room, []*user.User, int, error)
-	GetRooms(ctx context.Context, Limit, Offset int) ([]*Room,[]int, error)
+	GetRooms(ctx context.Context, Limit, Offset int, UserId int64) ([]*Room,[]int, error)
 	DeleteRoom(ctx context.Context, roomID int64) error
 }
 

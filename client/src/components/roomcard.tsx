@@ -20,6 +20,12 @@ const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
           {room.unreadCount}
         </div>
       )}
+
+      {!('unreadCount' in room) && (
+        <button className = " bg-blue-600 hover:bg-blue-700 transition rounded px-4 py-2 font-semibold">
+          Join
+        </button>
+      )}
     </div>
   );
 };
