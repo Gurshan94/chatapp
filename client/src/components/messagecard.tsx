@@ -21,7 +21,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message }) => {
   const handleDeleteMessage= async (messageId:number)=>{
     // Implement the delete message logic here
     try {
-      const data=await deleteMessage({messageId:messageId}).unwrap()
+      await deleteMessage({messageId:messageId}).unwrap()
       dispatch(deleteMessageWithID({messageId:messageId}))
     } catch (error) {
       console.error('Error deleting message:', error);

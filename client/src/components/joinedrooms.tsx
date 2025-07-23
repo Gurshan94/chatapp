@@ -44,8 +44,9 @@ import { BackendRoom } from "../state/room/roomSlice";
                 className="cursor-pointer"
               >
                 <RoomCard room={room} />
-              </div>            
-          ))}        
+                <div>{Error}</div>
+              </div>
+            ))}
           </div>
         </div>
      

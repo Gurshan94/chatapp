@@ -7,12 +7,14 @@ import { setCredentials } from "../state/user/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
+
 const Signup = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [signup] = useSignupMutation();
   const [login] = useLoginMutation();
+  
 
 
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +31,7 @@ const Signup = () => {
       await signup({ username, email, password }).unwrap();
       const data = await login({ email, password }).unwrap();
       dispatch(setCredentials(data)); 
-      navigate('/chat');
+      navigate('/login');
     } catch (err: any) {
       setError(err.data?.message || 'Login failed');
     }

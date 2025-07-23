@@ -3,9 +3,22 @@ import { useGetroomsMutation } from "../state/room/roomApiSlice";
 import { useEffect, useRef } from 'react';
 import { BackendRoom } from '../state/room/roomSlice';
 import RoomCard from './roomcard';
+import { useJoinroomMutation } from '../state/room/roomApiSlice';
+import { useSelector,useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from "../state/store";
+import {joinRoom} from "../state/room/roomSlice"
+import { useState } from 'react';
+
+
 
 const DiscoverRoomList = () => {
   const [fetchrooms] = useGetroomsMutation();
+  const [joinRoomMutation] = useJoinroomMutation()
+  const userid=useSelector((state:RootState)=>state.user.user?.id)
+  const dispatch=useDispatch<AppDispatch>()
+
+  const [justJoined, setJustJoined] = useState<Set<number>>(new Set());
+
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
@@ -59,6 +72,16 @@ const DiscoverRoomList = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const handleJoinRoom = async (room: BackendRoom, roomId: number) => {
+    try {
+      await joinRoomMutation({ roomid: roomId, userid:Number(userid) }).unwrap(); // Replace 1 with actual user ID
+      dispatch(joinRoom({ ...room }));
+      setJustJoined(prev => new Set(prev.add(roomId))); // Track joined rooms
+    } catch (error) {
+      console.error("Failed to join room:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full w-72 bg-gray-850 border-r border-gray-700">
       {/* Scrollable container */}
@@ -73,7 +96,7 @@ const DiscoverRoomList = () => {
 
         <div className="flex flex-col gap-2">
           {allRooms.map((room: BackendRoom) => (
-             <RoomCard key={room.id} room={room}/>
+             <RoomCard key={room.id} room={room} joinedTag={justJoined.has(room.id)} onJoin={() => handleJoinRoom(room, room.id)} />
           ))}
         </div>
 

@@ -3,7 +3,7 @@ import { createApi,fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const roomApi = createApi({
     reducerPath: 'roomApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8080',
+        baseUrl: import.meta.env.VITE_BASE_URL ,
         credentials: 'include',
     }),
     endpoints:(builder) =>({
@@ -25,9 +25,9 @@ export const roomApi = createApi({
                 },
             }),
         }),
-        fetchmessages: builder.mutation<any, {roomid:number| null, limit:number, offset:number}>({
+        fetchmessages: builder.mutation<any, {roomid:number| null, limit:number, cursor:string}>({
             query:(credentials) =>({
-                url: `/fetchmessage/${credentials.roomid}?limit=${credentials.limit}&offset=${credentials.offset}`,
+                url: `/fetchmessage/${credentials.roomid}?limit=${credentials.limit}&cursor=${credentials.cursor ?? ""}`,
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

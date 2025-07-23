@@ -20,7 +20,7 @@ func InitRouter(userHandler *user.Handler, wsHandler *ws.Handler, roomHandler *r
 	r = gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // your frontend origin
+		AllowOrigins:     []string{"http://localhost","http://localhost:80","http://localhost:5173"}, // your frontend origin
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

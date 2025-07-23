@@ -39,6 +39,6 @@ func main() {
 	wsHandler := ws.Newhandler(hub)
 	go hub.Run()
 
-	router.InitRouter(userHandler, wsHandler, roomHandler, roomUserHandler, messageHandler, )
+	router.InitRouter(userHandler, wsHandler, roomHandler, roomUserHandler, messageHandler)
 	router.Start("0.0.0.0:8080")
 }

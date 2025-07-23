@@ -28,6 +28,7 @@ export interface Room extends BackendRoom {
 
 interface roomState {
     joinedRooms: Room[],
+    discoverRooms: BackendRoom[],
     selectedRoomId: number | null,
     activeTab: "joined" | "discover" | "create",
     messages: Message[]
@@ -35,6 +36,7 @@ interface roomState {
 
 const initialState: roomState = {
     joinedRooms: [],
+    discoverRooms: [],
     selectedRoomId: null,
     activeTab: "joined",
     messages: []
@@ -48,12 +50,11 @@ const roomSlice = createSlice({
             state.joinedRooms=action.payload.map(room=>({
                 ...room,
                 unreadCount: 0,
-                messages:[],
             }));
         },
         closeroom:(state)=>{
             state.selectedRoomId=null
-        },
+        }, 
         openRoom:(state, action:PayloadAction<{roomId:number}>) => {
             const room=state.joinedRooms.find(r => r.id == action.payload.roomId)
 
@@ -125,6 +126,6 @@ export const {
     leaveRoom,
     appendMessages,
     deleteMessageWithID,
-    closeroom
+    closeroom,
 } = roomSlice.actions;
 export default roomSlice.reducer;

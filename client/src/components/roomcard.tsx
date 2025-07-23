@@ -3,9 +3,11 @@ import { BackendRoom, Room } from "../state/room/roomSlice";
 
 interface RoomCardProps {
     room: BackendRoom | Room;
+    joinedTag?: boolean; 
+    onJoin?: () => void ;
   }
 
-const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
+const RoomCard: React.FC<RoomCardProps> = ({ room, joinedTag, onJoin }) => {
   return (
     <div className="p-4 rounded bg-gray-800 text-gray-200 shadow-sm hover:bg-gray-700 transition-colors duration-200 flex justify-between items-center">
       <div>
@@ -21,11 +23,12 @@ const RoomCard: React.FC<RoomCardProps> = ({ room }) => {
         </div>
       )}
 
-      {!('unreadCount' in room) && (
-        <button className = " bg-blue-600 hover:bg-blue-700 transition rounded px-4 py-2 font-semibold">
+      {!('unreadCount' in room) && (joinedTag ? ( <span className="joined-tag">Joined</span>) :
+      
+      (<button onClick={onJoin} className = " bg-blue-600 hover:bg-blue-700 transition rounded px-4 py-2 font-semibold">
           Join
         </button>
-      )}
+      ))}
     </div>
   );
 };
