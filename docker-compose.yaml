@@ -1,0 +1,66 @@
+services:
+  client-nginx:
+    labels:
+      shipyard.route: '/'
+      shipyard.primary-route: true
+    image: client-nginx
+    build:
+      context: client
+      dockerfile: Dockerfile
+    init: true
+    networks:
+      - frontend
+    ports:
+      - 80:8080
+    restart: unless-stopped
+  api-golang:
+    labels:
+      shipyard.route: '/api/golang/'
+      shipyard.primary-route: true
+    image: api-golang
+    build:
+      context: server
+      dockerfile: Dockerfile
+    init: true
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:foobarbaz@db:5432/postgres?sslmode=disable
+    networks:
+      - frontend 
+      - backend
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+  db:
+    image: postgres:15.1-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=foobarbaz
+    networks:
+      - backend
+    ports:
+      - 5432:5432
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      - db
+    volumes:
+      - ./server/db/migrations:/migrations
+    entrypoint:
+      [
+        "migrate", 
+        "-path", "/migrations", 
+        "-database", "postgres://postgres:foobarbaz@db:5432/postgres?sslmode=disable", 
+        "up"
+      ]
+    networks:
+      - backend
+    restart: "no"
+
+volumes:
+  pgdata:
+networks:
+  frontend:
+  backend:

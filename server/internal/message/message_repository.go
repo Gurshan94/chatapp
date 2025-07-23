@@ -37,16 +37,21 @@ func (r *repository) AddMessage(ctx context.Context, message *Message) (*Message
 	return message, nil
 }
 
-func (r *repository) FetchMessage(ctx context.Context, roomID, limit, offset int64 ) ([]*FetchMessage, error) {
+func (r *repository) FetchMessage(ctx context.Context, roomID, limit int64, cursor *time.Time ) ([]*FetchMessage, error) {
 	query := `
 		SELECT m.id, m.room_id, m.sender_id, u.username, m.content, m.deleted, m.created_at 
 		FROM messages m 
 		JOIN users u ON m.sender_id = u.id  
-		WHERE m.room_id = $1 
+		WHERE m.room_id = $1
 		AND m.deleted = FALSE
+		AND ($2::timestamp IS NULL OR m.created_at < $2)
 		ORDER BY m.created_at DESC 
-		LIMIT $2 OFFSET $3;`
-	rows, err := r.db.QueryContext(ctx, query, roomID, limit, offset)
+		LIMIT $3;`
+	var rows *sql.Rows
+	var err error
+
+	rows, err = r.db.QueryContext(ctx, query, roomID, cursor, limit)
+	
 	if err != nil {
 		return nil, err
 	}

@@ -46,7 +46,7 @@ func (s *service) FetchMessage(c context.Context, req *FetchMessageReq) ([]*Fetc
 	ctx, cancel:= context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	messages, err:= s.Repository.FetchMessage(ctx, req.RoomID, req.Limit, req.Offset)
+	messages, err:= s.Repository.FetchMessage(ctx, req.RoomID, req.Limit, req.Cursor)
 	if err!=nil {
 		return nil, err
 	}

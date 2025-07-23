@@ -51,12 +51,18 @@ type FetchMessageRes struct {
 type FetchMessageReq struct {
 	RoomID int64 `json:"roomid"`
 	Limit int64 `json:"limit"`
-	Offset int64 `json:"offset"`
+	Cursor *time.Time `json:"cursor"`
+}
+
+type PaginatedMessagesResponse struct {
+	Messages   []*FetchMessageRes `json:"messages"`
+	NextCursor *string `json:"next_cursor,omitempty"`
+	HasMore    bool   `json:"has_more"`
 }
 
 type Repository interface {
 	AddMessage (ctx context.Context, message *Message) (*Message, error) 
-	FetchMessage (ctx context.Context, roomID, limit, offset int64  ) ([]*FetchMessage, error)
+	FetchMessage (ctx context.Context, roomID, limit int64, cursor *time.Time  ) ([]*FetchMessage, error)
 	DeleteMessage (ctx context.Context, messageID int64) error 
 }
 

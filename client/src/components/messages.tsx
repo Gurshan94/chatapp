@@ -18,29 +18,31 @@ const MessageList: React.FC<MyComponentProps> = ({roomid}) => {
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const dispatch=useDispatch()
 
-  const fetchMessages = async ({ pageParam=0 }) => {
+  const fetchMessages = async ({ pageParam="" }) => {
 
-    const res:Message[] = await fetchmessages({roomid: roomid, limit: 8, offset: pageParam}).unwrap();
+    const res = await fetchmessages({roomid: roomid, limit: 10, cursor: pageParam}).unwrap();
      return {
-      messages: res,
-      nextOffset: 8+pageParam,
-      hasMore: res.length === 8,
+      messages: res.messages,
+      nextCursor: res.next_cursor,
+      hasMore: res.has_more,
      };
 
     };
+
+
     const {
       data,
       fetchNextPage,
       hasNextPage,
       isFetchingNextPage,
       status,
-      error
+      error,
     } = useInfiniteQuery({
-      queryKey: ['messages',roomid],
+      queryKey: ['messages', roomid],
       queryFn: fetchMessages,
-      initialPageParam: 0,
-      getNextPageParam: (lastPage) =>
-       lastPage.hasMore ? lastPage.nextOffset : undefined,
+      initialPageParam: "", // for the first page, pass empty cursor
+      getNextPageParam: (lastPage) => 
+        lastPage.hasMore ? lastPage.nextCursor : undefined,
     });
 
     useEffect(() => {
